@@ -48,12 +48,24 @@ async function load() {
     (new Date(time) - new Date()) / 60000
   ))
 
+  const delay = dep.delay ? Math.round(dep.delay / 60) : 0
+
+  let timeText = ""
+
+  if (dep.cancelled) {
+    timeText = "Fällt aus"
+  } else if (delay > 0) {
+    timeText = minutes + " min (+" + delay + ")"
+  } else {
+    timeText = minutes + " min"
+  }
+
   const div = document.createElement("div")
   div.className = "line"
 
   div.innerHTML =
     "<span>" + dep.line.name + " → " + dep.direction + "</span>" +
-    "<span>" + minutes + " min</span>"
+    "<span>" + timeText + "</span>"
 
   board.appendChild(div)
 
