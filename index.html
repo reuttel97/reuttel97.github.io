@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Wedding Abfahrten</title>
+
+<style>
+body {
+  background: black;
+  color: orange;
+  font-family: monospace;
+  font-size: 24px;
+}
+
+.line {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+</style>
+</head>
+
+<body>
+
+<h1>S+U Wedding</h1>
+<div id="board"></div>
+
+<script>
+async function load() {
+  const res = await fetch(
+    "https://v6.bvg.transport.rest/stops/900009104/departures?duration=10")
+
+ const json = await res.json()
+ const data = json.departures || json
+ console.log(data)
+  const board = document.getElementById("board")
+
+  board.innerHTML = ""
+
+  data.forEach(dep => {
+
+  if (!dep.line.name.startsWith("U")) return;
+
+  const time = dep.when || dep.plannedWhen
+  if (!time) return;
+
+  const minutes = Math.max(0, Math.round(
+    (new Date(time) - new Date()) / 60000
+  ))
+
+  const div = document.createElement("div")
+  div.className = "line"
+
+  div.innerHTML =
+    "<span>" + dep.line.name + " → " + dep.direction + "</span>" +
+    "<span>" + minutes + " min</span>"
+
+  board.appendChild(div)
+
+})
+}
+
+load()
+setInterval(load, 30000)
+</script>
+
+</body>
+</html>
