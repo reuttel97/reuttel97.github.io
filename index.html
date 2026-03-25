@@ -17,6 +17,15 @@ body {
   justify-content: space-between;
   margin: 10px 0;
 }
+  @keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+  .blink {
+  animation: blink 1s infinite;
+}
 </style>
 </head>
 
@@ -37,7 +46,7 @@ async function load() {
 
   board.innerHTML = ""
 
-  data.forEach(dep => {
+  data.forEach((dep, index) => {
 
   if (!dep.line.name.startsWith("U")) return;
 
@@ -50,22 +59,32 @@ async function load() {
 
   const delay = dep.delay ? Math.round(dep.delay / 60) : 0
 
-  let timeText = ""
-
-  if (dep.cancelled) {
-    timeText = "Fällt aus"
-  } else if (delay > 0) {
-    timeText = minutes + " min (+" + delay + ")"
-  } else {
-    timeText = minutes + " min"
-  }
+  const isFirst = index === 0
 
   const div = document.createElement("div")
   div.className = "line"
 
-  div.innerHTML =
-    "<span>" + dep.line.name + " → " + dep.direction + "</span>" +
-    "<span>" + timeText + "</span>"
+  const left = document.createElement("span")
+  left.textContent = dep.line.name + " → " + dep.direction
+
+  const right = document.createElement("span")
+
+  if (dep.cancelled) {
+    right.textContent = "Fällt aus"
+
+  } else if (isFirst && minutes === 0) {
+    right.textContent = ""
+    left.classList.add("blink")
+
+  } else if (delay > 0) {
+    right.textContent = minutes + " min (+" + delay + ")"
+
+  } else {
+    right.textContent = minutes + " min"
+  }
+
+  div.appendChild(left)
+  div.appendChild(right)
 
   board.appendChild(div)
 
